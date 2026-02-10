@@ -88,7 +88,35 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    _buildButton('Calculate', Colors.green, controller),
+                    Expanded(
+                      child: GetBuilder<HomeScreenController>(
+                        builder: (controller) {
+                          return ScaleTransition(
+                            scale: controller.scaleAnim,
+                            child: AnimatedBuilder(
+                              animation: controller.colorAnim,
+                              builder: (context, child) {
+                                return ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        controller.colorAnim.value!,
+                                  ),
+                                  onPressed: controller.onCalculatePressed,
+                                  child: const Text(
+                                    'Calculate',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ],

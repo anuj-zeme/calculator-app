@@ -1,20 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomeScreenController extends GetxController {
-  // Use a controller to manage the text field content synchronously
+class HomeScreenController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  late AnimationController animController;
+  late Animation<double> scaleAnim;
+  late Animation<Color?> colorAnim;
+
   final TextEditingController textController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
-    textController.text = '';
+
+    animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+      reverseDuration: const Duration(milliseconds: 400),
+    );
+
+    scaleAnim = Tween<double>(
+      begin: 1.0,
+      end: 0.92,
+    ).animate(CurvedAnimation(parent: animController, curve: Curves.easeOut));
+
+    colorAnim = ColorTween(
+      begin: Colors.green,
+      end: Colors.green.shade700,
+    ).animate(animController);
   }
 
   @override
   void onClose() {
+    animController.dispose();
     textController.dispose();
     super.onClose();
+  }
+
+  void onCalculatePressed() async {
+    await animController.forward();
+    await animController.reverse();
+    calculate();
   }
 
   void onButtonPressed(String value) {
