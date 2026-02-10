@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:calculator_app/routes/routes_name.dart';
 import 'controller.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -23,6 +24,14 @@ class HomeScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.history, color: Colors.white),
+              onPressed: () {
+                Get.toNamed(RoutesName.historyScreen);
+              },
+            ),
+          ],
         ),
         body: Column(
           children: [

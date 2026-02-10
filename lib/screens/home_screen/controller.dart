@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class HomeScreenController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -9,9 +10,17 @@ class HomeScreenController extends GetxController
 
   final TextEditingController textController = TextEditingController();
 
+  final storage = GetStorage();
+  RxList<String> history = <String>[].obs;
+
   @override
   void onInit() {
     super.onInit();
+
+    // Load history
+    if (storage.hasData('history')) {
+      history.assignAll(List<String>.from(storage.read('history')));
+    }
 
     animController = AnimationController(
       vsync: this,
@@ -74,9 +83,25 @@ class HomeScreenController extends GetxController
       }
 
       textController.text = resultStr;
+
+      // Add to history
+      _addToHistory("$currentText = $resultStr");
     } catch (e) {
       textController.text = "Error";
     }
+  }
+
+  void _addToHistory(String entry) {
+    history.insert(0, entry);
+    if (history.length > 20) {
+      history.removeLast();
+    }
+    storage.write('history', history.toList());
+  }
+
+  void clearHistory() {
+    history.clear();
+    storage.remove('history');
   }
 
   double _evaluateExpression(String expr) {
