@@ -7,8 +7,6 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Find the controller if it's already there, or put it.
-    // Since we navigate from HomeScreen, it should be there.
     final HomeScreenController controller = Get.find<HomeScreenController>();
 
     return Scaffold(
@@ -49,10 +47,7 @@ class HistoryScreen extends StatelessWidget {
                       controller.history[index],
                       style: const TextStyle(color: Colors.white, fontSize: 20),
                     ),
-                    onTap: () {
-                      // Optionally, populate the calculator with this result
-                      // For now, just copy it or do nothing
-                    },
+                    onTap: () {},
                   );
                 },
               ),
