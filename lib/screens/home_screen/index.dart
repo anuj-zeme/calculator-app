@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:calculator_app/routes/routes_name.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'controller.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -40,6 +41,9 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
               child: TextField(
                 controller: controller.textController,
+                readOnly: true,
+                showCursor: true,
+                enableInteractiveSelection: true,
                 textAlign: TextAlign.right,
                 style: const TextStyle(
                   color: Colors.white,
@@ -48,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  hintText: '0',
+                  hintText: '',
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
