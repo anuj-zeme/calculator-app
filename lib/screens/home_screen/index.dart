@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:calculator_app/routes/routes_name.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'controller.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -55,12 +54,42 @@ class HomeScreen extends StatelessWidget {
                   hintText: '',
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.+\-*/]')),
-                ],
+                contextMenuBuilder: (context, editableTextState) {
+                  final List<ContextMenuButtonItem> buttonItems =
+                      editableTextState.contextMenuButtonItems;
+
+                  // Add custom paste button
+                  buttonItems.insert(
+                    buttonItems.length,
+                    ContextMenuButtonItem(
+                      label: 'Paste',
+                      onPressed: () async {
+                        ContextMenuController.removeAny();
+                        final data = await Clipboard.getData(
+                          Clipboard.kTextPlain,
+                        );
+                        if (data != null && data.text != null) {
+                          controller.pasteText(data.text!);
+                        }
+                      },
+                    ),
+                  );
+
+                  return AdaptiveTextSelectionToolbar.buttonItems(
+                    anchors: editableTextState.contextMenuAnchors,
+                    buttonItems: buttonItems,
+                  );
+                },
+                onTap: () {
+                  // Allow cursor positioning on tap
+                  controller
+                      .textController
+                      .selection = TextSelection.fromPosition(
+                    TextPosition(
+                      offset: controller.textController.selection.baseOffset,
+                    ),
+                  );
+                },
                 onSubmitted: (value) => controller.calculate(),
               ),
             ),
