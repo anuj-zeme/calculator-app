@@ -9,6 +9,7 @@ class HomeScreenController extends GetxController
   late Animation<Color?> colorAnim;
 
   final TextEditingController textController = TextEditingController();
+  final FocusNode textFocusNode = FocusNode(canRequestFocus: false);
 
   final storage = GetStorage();
   RxList<String> history = <String>[].obs;
@@ -43,6 +44,7 @@ class HomeScreenController extends GetxController
   void onClose() {
     animController.dispose();
     textController.dispose();
+    textFocusNode.dispose();
     super.onClose();
   }
 
@@ -58,9 +60,48 @@ class HomeScreenController extends GetxController
     } else if (value == 'Calculate' || value == '=') {
       calculate();
     } else {
-      // Append value to current text
-      String currentText = textController.text;
-      textController.text = currentText + value;
+      // Insert value at current cursor position
+      final currentText = textController.text;
+      final cursorPosition = textController.selection.baseOffset;
+
+      // If cursor position is valid, insert at that position
+      if (cursorPosition >= 0) {
+        final newText =
+            currentText.substring(0, cursorPosition) +
+            value +
+            currentText.substring(cursorPosition);
+        textController.text = newText;
+
+        // Move cursor to after the inserted character
+        textController.selection = TextSelection.fromPosition(
+          TextPosition(offset: cursorPosition + value.length),
+        );
+      } else {
+        // Fallback: append to end if cursor position is invalid
+        textController.text = currentText + value;
+      }
+    }
+  }
+
+  void pasteText(String text) {
+    // Insert pasted text at current cursor position
+    final currentText = textController.text;
+    final cursorPosition = textController.selection.baseOffset;
+
+    if (cursorPosition >= 0) {
+      final newText =
+          currentText.substring(0, cursorPosition) +
+          text +
+          currentText.substring(cursorPosition);
+      textController.text = newText;
+
+      // Move cursor to after the pasted text
+      textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: cursorPosition + text.length),
+      );
+    } else {
+      // Fallback: append to end if cursor position is invalid
+      textController.text = currentText + text;
     }
   }
 
