@@ -98,6 +98,14 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
+                    _buildButton('(', Colors.grey, controller),
+                    _buildButton(')', Colors.grey, controller),
+                    _buildButton('C', Colors.orange, controller),
+                    _buildButton('AC', Colors.orange, controller),
+                  ],
+                ),
+                Row(
+                  children: [
                     _buildButton('7', Colors.grey, controller),
                     _buildButton('8', Colors.grey, controller),
                     _buildButton('9', Colors.grey, controller),
@@ -123,11 +131,12 @@ class HomeScreen extends StatelessWidget {
                 Row(
                   children: [
                     _buildButton('0', Colors.grey, controller),
+                    _buildButton('00', Colors.grey, controller),
                     _buildButton('.', Colors.grey, controller),
-                    _buildButton('C', Colors.grey, controller),
                     _buildButton('+', Colors.orange, controller),
                   ],
                 ),
+
                 Row(
                   children: [
                     Expanded(

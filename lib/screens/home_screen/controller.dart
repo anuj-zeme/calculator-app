@@ -55,8 +55,24 @@ class HomeScreenController extends GetxController
   }
 
   void onButtonPressed(String value) {
-    if (value == 'C') {
+    if (value == 'AC') {
       textController.clear();
+    } else if (value == 'C') {
+      final text = textController.text;
+      final selection = textController.selection;
+      final cursor = selection.baseOffset;
+
+      if (text.isEmpty || cursor == -1) {
+        return;
+      }
+
+      if (cursor > 0) {
+        final newText = text.substring(0, cursor - 1) + text.substring(cursor);
+
+        textController.text = newText;
+
+        textController.selection = TextSelection.collapsed(offset: cursor - 1);
+      }
     } else if (value == 'Calculate' || value == '=') {
       calculate();
     } else {
@@ -148,7 +164,49 @@ class HomeScreenController extends GetxController
   double _evaluateExpression(String expr) {
     if (expr.isEmpty) return 0;
 
-    // 1. Tokenize: Split numbers and operators
+    // Remove all whitespace
+    expr = expr.replaceAll(' ', '');
+
+    // 1. Handle brackets first (recursively)
+    while (expr.contains('(')) {
+      // Find the innermost bracket pair
+      int closingIndex = expr.indexOf(')');
+      if (closingIndex == -1) {
+        throw Exception("Mismatched brackets");
+      }
+
+      // Find the matching opening bracket (the last '(' before this ')')
+      int openingIndex = -1;
+      for (int i = closingIndex - 1; i >= 0; i--) {
+        if (expr[i] == '(') {
+          openingIndex = i;
+          break;
+        }
+      }
+
+      if (openingIndex == -1) {
+        throw Exception("Mismatched brackets");
+      }
+
+      // Extract the expression inside the brackets
+      String innerExpr = expr.substring(openingIndex + 1, closingIndex);
+
+      // Recursively evaluate the inner expression
+      double innerResult = _evaluateExpression(innerExpr);
+
+      // Replace the bracketed expression with its result
+      expr =
+          expr.substring(0, openingIndex) +
+          innerResult.toString() +
+          expr.substring(closingIndex + 1);
+    }
+
+    // Check for unmatched closing bracket
+    if (expr.contains(')')) {
+      throw Exception("Mismatched brackets");
+    }
+
+    // 2. Tokenize: Split numbers and operators
     List<String> tokens = [];
     String currentNumber = '';
 
@@ -171,7 +229,7 @@ class HomeScreenController extends GetxController
     // If no tokens found, return 0
     if (tokens.isEmpty) return 0;
 
-    // 2. Handle * and / (Precedence)
+    // 3. Handle * and / (Precedence)
     // Create new list for next pass
     List<String> pass1 = [];
 
@@ -199,7 +257,7 @@ class HomeScreenController extends GetxController
       }
     }
 
-    // 3. Handle + and -
+    // 4. Handle + and -
     if (pass1.isEmpty) return 0;
 
     double result = double.tryParse(pass1[0]) ?? 0.0;
