@@ -40,6 +40,9 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
               child: TextField(
                 controller: controller.textController,
+                readOnly: true,
+                showCursor: true,
+                enableInteractiveSelection: true,
                 textAlign: TextAlign.right,
                 style: const TextStyle(
                   color: Colors.white,
@@ -48,15 +51,45 @@ class HomeScreen extends StatelessWidget {
                 ),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  hintText: '0',
+                  hintText: '',
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.+\-*/]')),
-                ],
+                contextMenuBuilder: (context, editableTextState) {
+                  final List<ContextMenuButtonItem> buttonItems =
+                      editableTextState.contextMenuButtonItems;
+
+                  // Add custom paste button
+                  buttonItems.insert(
+                    buttonItems.length,
+                    ContextMenuButtonItem(
+                      label: 'Paste',
+                      onPressed: () async {
+                        ContextMenuController.removeAny();
+                        final data = await Clipboard.getData(
+                          Clipboard.kTextPlain,
+                        );
+                        if (data != null && data.text != null) {
+                          controller.pasteText(data.text!);
+                        }
+                      },
+                    ),
+                  );
+
+                  return AdaptiveTextSelectionToolbar.buttonItems(
+                    anchors: editableTextState.contextMenuAnchors,
+                    buttonItems: buttonItems,
+                  );
+                },
+                onTap: () {
+                  // Allow cursor positioning on tap
+                  controller
+                      .textController
+                      .selection = TextSelection.fromPosition(
+                    TextPosition(
+                      offset: controller.textController.selection.baseOffset,
+                    ),
+                  );
+                },
                 onSubmitted: (value) => controller.calculate(),
               ),
             ),
